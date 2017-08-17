@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Exercise12</string>
+    <string name="async_task_btn">Async Task</string>
+    <string name="post_btn">Post</string>
+    <string name="async_task_loader_btn">Async Task Loader</string>
+    <string name="reset">Reset</string>
+    <string name="image_info">aaa</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 無効状態 -->
+    <item android:color="@color/Gray200" android:state_enabled="false" />
+    <!-- 通常状態 -->
+    <item android:color="@color/Gray300" android:state_enabled="true" android:state_pressed="false" />
+</selector>
