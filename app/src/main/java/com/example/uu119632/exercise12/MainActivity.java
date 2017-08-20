@@ -13,21 +13,35 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+/**
+ * MainActivity
+ *
+ * @author :ryo.yamada
+ * @since :1.0 2017/08/18
+ */
 public class MainActivity extends AppCompatActivity implements GrayAsyncTask.AsyncTaskListener {
 
-    public static final String ARG_EXTRA_PARAM = "param_args";
+    private static final String ARG_EXTRA_PARAM = "param_args";
+    private final int LOADER_ID = 100;
 
     static Button asyncTaskBtn;
     static Button postBtn;
-    static Button asyncTaskLoaderBtn;
-    static ImageView imageView;
+    private static Button asyncTaskLoaderBtn;
+    private static ImageView imageView;
     private ProgressDialog progressDialog;
-    private Button resetBtn;
     private Bitmap bmp;
     private GrayAsyncTask task;
 
-    private final int LOADER_ID = 100;
     private final LoaderManager.LoaderCallbacks<Bitmap> callbacks = new LoaderManager.LoaderCallbacks<Bitmap>() {
+
+        /**
+         * onCreateLoader
+         * idに紐づくloaderのインスタンスを生成する。
+         *
+         * @param id id
+         * @param args bundle
+         * @return Loaderのインスタンス
+         */
         @Override
         public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
             // Loaderが生成された
@@ -39,6 +53,13 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
             return new GrayAsyncTaskLoader(MainActivity.this, bmp);
         }
 
+        /**
+         * onLoadFinished
+         * loaderのデータ生成完了通知。
+         *
+         * @param loader loader
+         * @param data loaderによって生成されたデータ
+         */
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
             // Loaderの破棄
@@ -51,12 +72,22 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
             getSupportLoaderManager().destroyLoader(LOADER_ID);
         }
 
+        /**
+         * onLoaderReset
+         * 作成したLoaderのリセット通知
+         *
+         * @param loader loader
+         */
         @Override
         public void onLoaderReset(Loader<Bitmap> loader) {
-            // リセットしたい場合
         }
     };
 
+    /**
+     * onCreate
+     *
+     * @param savedInstanceState savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
         asyncTaskBtn = (Button) findViewById(R.id.async_task_btn);
         postBtn = (Button) findViewById(R.id.post_btn);
         asyncTaskLoaderBtn = (Button) findViewById(R.id.async_task_loader_btn);
-        resetBtn = (Button) findViewById(R.id.reset_btn);
+        Button resetBtn = (Button) findViewById(R.id.reset_btn);
 
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.android_eat_apple);
         imageView = (ImageView) findViewById(R.id.imageView);
@@ -73,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
 
         task = new GrayAsyncTask(this, imageView, this);
 
+        // AsyncTaskボタン押下時の処理
         asyncTaskBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
             }
         });
 
+        // Postボタン押下時の処理
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
             }
         });
 
+        // AsyncTaskLoaderボタン押下時の処理
         asyncTaskLoaderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
             }
         });
 
+        // Resetボタン押下時の処理
         resetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,11 +179,17 @@ public class MainActivity extends AppCompatActivity implements GrayAsyncTask.Asy
         });
     }
 
+    /**
+     * OnTaskFinished
+     */
     @Override
     public void OnTaskFinished() {
         task = new GrayAsyncTask(this, imageView, this);
     }
 
+    /**
+     * OnTaskCancelled
+     */
     @Override
     public void OnTaskCancelled() {
         task = new GrayAsyncTask(this, imageView, this);

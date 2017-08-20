@@ -8,25 +8,49 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
-public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements DialogInterface.OnCancelListener {
+/**
+ * グレースケール化とプログレスバーを管理するクラス
+ *
+ * @author :ryo.yamada
+ * @since :1.0 :2017/08/18
+ */
+class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements DialogInterface.OnCancelListener {
 
-    private ImageView imageView;
+    private static final double GRAY_RED = 0.299;
+    private static final double GRAY_GREEN = 0.587;
+    private static final double GRAY_BLUE = 0.114;
+
+    private final ImageView imageView;
     private ProgressDialog progressDialog;
-    private Context context;
-    private AsyncTaskListener listener;
+    private final Context context;
+    private final AsyncTaskListener listener;
 
+    /**
+     * CallbackInterface
+     */
     interface AsyncTaskListener {
         void OnTaskFinished();
 
         void OnTaskCancelled();
     }
 
-    public GrayAsyncTask(Context context, ImageView imageView, AsyncTaskListener listener) {
+    /**
+     * コンストラクタ
+     *
+     * @param context   context
+     * @param imageView imageView
+     * @param listener  listener
+     */
+    GrayAsyncTask(Context context, ImageView imageView, AsyncTaskListener listener) {
         this.context = context;
         this.imageView = imageView;
         this.listener = listener;
     }
 
+    /**
+     * 非同期処理を行う前に行うメソッド
+     * プログレスバーの設定
+     */
     @Override
     protected void onPreExecute() {
         progressDialog = new ProgressDialog(context);
@@ -37,6 +61,12 @@ public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements
         progressDialog.show();
     }
 
+    /**
+     * ワーカースレッドで行う処理
+     *
+     * @param bitmap bitmap
+     * @return グレースケール化した画像
+     */
     @Override
     protected Bitmap doInBackground(Bitmap... bitmap) {
         Bitmap out = bitmap[0].copy(Bitmap.Config.ARGB_8888, true);
@@ -47,18 +77,22 @@ public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements
         for (j = 0; j < height; j++) {
             for (i = 0; i < width; i++) {
                 int pixelColor = out.getPixel(i, j);
-                // モノクロ化
-                int y = (int) (0.299 * Color.red(pixelColor) +
-                        0.587 * Color.green(pixelColor) +
-                        0.114 * Color.blue(pixelColor));
+                // グレースケール化
+                int y = (int) (GRAY_RED * Color.red(pixelColor) +
+                        GRAY_GREEN * Color.green(pixelColor) +
+                        GRAY_BLUE * Color.blue(pixelColor));
                 out.setPixel(i, j, Color.rgb(y, y, y));
             }
             publishProgress(i + j * height);
         }
-
         return out;
     }
 
+    /**
+     * ワーカースレッドで行う処理後に行う処理
+     *
+     * @param result グレースケール化した画像
+     */
     @Override
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
@@ -71,6 +105,11 @@ public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements
         }
     }
 
+    /**
+     * プログレスバーの更新を行う。
+     *
+     * @param values value
+     */
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
@@ -79,6 +118,9 @@ public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements
         }
     }
 
+    /**
+     * AsyncTaskのキャンセル処理
+     */
     @Override
     protected void onCancelled() {
         super.onCancelled();
@@ -87,6 +129,11 @@ public class GrayAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> implements
         }
     }
 
+    /**
+     * ダイアログのキャンセル処理
+     *
+     * @param dialogInterface dialogInterface
+     */
     @Override
     public void onCancel(DialogInterface dialogInterface) {
         this.cancel(true);
